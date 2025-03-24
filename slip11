@@ -1,0 +1,95 @@
+1. Design an HTML page which passes customer number to a search servlet. The servlet
+searches for the customer number in a database (customer table) and returns customer
+details if found the number otherwise display error message.
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+public class DisplayTableColumns {
+private static final String DATABASE_URL = "jdbc:mysql://localhost:3306/your_database"; //
+Replace with your database URL
+private static final String USERNAME = "your_username"; // Replace with your database
+username
+private static final String PASSWORD = "your_password"; // Replace with your database
+password
+public static void main(String[] args) {
+try (Connection connection = DriverManager.getConnection(DATABASE_URL,
+USERNAME, PASSWORD)) {
+String selectQuery = "SELECT * FROM DONAR"; // Assuming DONAR is the table
+name
+try (PreparedStatement preparedStatement =
+connection.prepareStatement(selectQuery);
+ResultSet resultSet = preparedStatement.executeQuery()) {// Get metadata
+ResultSetMetaData metaData = resultSet.getMetaData();
+int columnCount = metaData.getColumnCount();
+System.out.println("Information about columns in the DONAR table:");
+for (int i = 1; i <= columnCount; i++) {
+System.out.println("Column " + i + ":");
+System.out.println(" Name: " + metaData.getColumnName(i));
+System.out.println(" Type: " + metaData.getColumnTypeName(i));
+System.out.println(" Size: " + metaData.getColumnDisplaySize(i));
+System.out.println(" Nullable: " + (metaData.isNullable(i) ==
+ResultSetMetaData.columnNoNulls ? "No" : "Yes"));
+System.out.println(" Auto Increment: " + metaData.isAutoIncrement(i));
+System.out.println("---------------------------");
+}
+}
+} catch (SQLException e) {
+e.printStackTrace();
+}
+}
+}
+
+
+
+2. Write a Java program to display information about all columns in the DONAR table
+using ResultSetMetaData.
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DonarTableMetadata {
+
+    private static final String URL = "jdbc:sqlite:donar.db"; // Change this to your database URL
+
+    public static void main(String[] args) {
+        displayDonarTableMetadata();
+    }
+
+    private static void displayDonarTableMetadata() {
+        String sql = "SELECT * FROM DONAR"; // Adjust the SQL query as needed
+
+        try (Connection conn = DriverManager.getConnection(URL);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            // Get ResultSetMetaData
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnCount = metaData.getColumnCount();
+
+            System.out.println("Column Count: " + columnCount);
+            System.out.println("Columns in DONAR table:");
+
+            // Loop through the columns and display their information
+            for (int i = 1; i <= columnCount; i++) {
+                String columnName = metaData.getColumnName(i);
+                String columnType = metaData.getColumnTypeName(i);
+                int columnSize = metaData.getColumnDisplaySize(i);
+                boolean isNullable = metaData.isNullable(i) == ResultSetMetaData.columnNullable;
+
+                System.out.printf("Column %d: Name = %s, Type = %s, Size = %d, Nullable = %b%n",
+                        i, columnName, columnType, columnSize, isNullable);
+            }
+        } catch (SQLException e) {
+            System.out.println("Database error: " + e.getMessage());
+        }
+    }
+}
