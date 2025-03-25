@@ -1,0 +1,90 @@
+1. Write a java program to display name and priority of a Thread.
+
+
+class MyThread extends Thread {
+    @Override
+    public void run() {
+        // This is where the thread's task would be defined
+        System.out.println("Thread is running: " + getName());
+    }
+}
+
+public class ThreadInfoExample {
+    public static void main(String[] args) {
+        // Create a new thread
+        MyThread thread = new MyThread();
+        
+        // Set the name of the thread
+        thread.setName("MyCustomThread");
+        
+        // Set the priority of the thread (1 to 10)
+        thread.setPriority(Thread.MAX_PRIORITY); // Setting to maximum priority
+        
+        // Display the name and priority of the thread
+        System.out.println("Thread Name: " + thread.getName());
+        System.out.println("Thread Priority: " + thread.getPriority());
+        
+        // Start the thread
+        thread.start();
+    }
+}
+
+
+2. Write a SERVLET program which counts how many times a user has visited a web
+page. If user is visiting the page for the first time, display a welcome message. If the
+user is revisiting the page, display the number of times visited. (Use Cookie)
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/visitCounter")
+public class VisitCounterServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Set the content type
+        response.setContentType("text/html");
+
+        // Get cookies from the request
+        Cookie[] cookies = request.getCookies();
+        int visitCount = 0;
+        boolean found = false;
+
+        // Check if the visit count cookie exists
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("visitCount")) {
+                    visitCount = Integer.parseInt(cookie.getValue());
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        // Increment the visit count
+        visitCount++;
+
+        // Create or update the visit count cookie
+        Cookie visitCountCookie = new Cookie("visitCount", Integer.toString(visitCount));
+        visitCountCookie.setMaxAge(60 * 60 * 24); // Cookie will last for 1 day
+        response.addCookie(visitCountCookie);
+
+        // Generate the response
+        String message;
+        if (found) {
+            message = "Welcome back! You have visited this page " + visitCount + " times.";
+        } else {
+            message = "Welcome! This is your first visit to this page.";
+        }
+
+        // Write the message to the response
+        response.getWriter().println("<html><body>");
+        response.getWriter().println("<h1>" + message + "</h1>");
+        response.getWriter().println("</body></html>");
+    }
+}
