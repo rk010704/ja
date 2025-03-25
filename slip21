@@ -1,0 +1,111 @@
+1. Write a java program to accept ‘N’ Subject Names from a user store them into
+LinkedList Collection and Display them by using Iterator interface.
+
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.Scanner;
+public class SubjectNamesLinkedList {
+public static void main(String[] args) {Scanner scanner = new Scanner(System.in);
+// Accept 'N' subject names from the user
+System.out.print("Enter the value of N: ");
+int n = scanner.nextInt();
+// Create a LinkedList to store subject names
+LinkedList<String> subjectList = new LinkedList<>();
+// Accept subject names from the user and add them to the LinkedList
+for (int i = 0; i < n; i++) {
+System.out.print("Enter subject name " + (i + 1) + ": ");
+String subjectName = scanner.next();
+subjectList.add(subjectName);
+}
+// Display subject names using Iterator
+System.out.println("Subject Names:");
+Iterator<String> iterator = subjectList.iterator();
+while (iterator.hasNext()) {
+System.out.println(iterator.next());
+}
+scanner.close();
+}
+}
+
+
+
+2. Write a java program to solve producer consumer problem in which a producer
+produces a value and consumer consume the value before producer generate the next
+value. (Hint: use thread synchronization)
+
+
+class SharedResource {
+    private int value;
+    private boolean available = false;
+
+    public synchronized int consume() throws InterruptedException {
+        while (!available) {
+            wait(); // Wait until the value is produced
+        }
+        System.out.println("Consumed: " + value);
+        available = false;
+        notify(); // Notify the producer that the value has been consumed
+        return value;
+    }
+
+    public synchronized void produce(int value) throws InterruptedException {
+        while (available) {
+            wait(); // Wait until the value is consumed
+        }
+        this.value = value;
+        available = true;
+        System.out.println("Produced: " + value);
+        notify(); // Notify the consumer that a new value is available
+    }
+}
+
+class Producer implements Runnable {
+    private SharedResource sharedResource;
+
+    public Producer(SharedResource sharedResource) {
+        this.sharedResource = sharedResource;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 1; i <= 10; i++) {
+            try {
+                sharedResource.produce(i);
+                Thread.sleep(500); // Simulate time taken to produce
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+}
+
+class Consumer implements Runnable {
+    private SharedResource sharedResource;
+
+    public Consumer(SharedResource sharedResource) {
+        this.sharedResource = sharedResource;
+    }
+
+    @Override
+    public void run() {
+        for (int i = 1; i <= 10; i++) {
+            try {
+                sharedResource.consume();
+                Thread.sleep(1000); // Simulate time taken to consume
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+}
+
+public class ProducerConsumerExample {
+    public static void main(String[] args) {
+        SharedResource sharedResource = new SharedResource();
+        Thread producerThread = new Thread(new Producer(sharedResource));
+        Thread consumerThread = new Thread(new Consumer(sharedResource));
+
+        producerThread.start();
+        consumerThread.start();
+    }
+}
